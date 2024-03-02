@@ -1,0 +1,39 @@
+version: '3.9.0'
+
+services: 
+  postgres: 
+    image: postgres:16
+    platform: linux/arm64/v8
+    environment: 
+      POSTGRES_DB: scrapy_db
+      POSTGRES_USER: scrapy_user
+      POSTGRES_PASSWORD: scrapy_password
+    ports: 
+      - "5432:5432"
+    volumes: 
+      - postgres_data:/var/lib/postgresql/data
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: 'emir_balkan@hotmail.com'
+      PGADMIN_DEFAULT_PASSWORD: 'pgadmin4'
+    ports: 
+      - "80:80"
+
+
+  scrapy:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - ./jobs_project:/app
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://scrapy_user:scrapy_password@postgres:5432/scrapy_db
+
+volumes:
+  postgres_data:
+  
